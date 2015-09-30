@@ -61,9 +61,14 @@ class RegistrationController extends Controller
      */
     public function actionCreate()
     {
+
         $model = new Registration();
         if ($model->load(Yii::$app->request->post())) {
             $model->file_payment_receipt = UploadedFile::getInstance($model,'file_payment_receipt');
+            $model->file_student_id = UploadedFile::getInstance($model,'file_student_id');
+            //var_dump($model);
+            $model->validate();
+            var_dump($model->errors);
             if($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }

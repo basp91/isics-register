@@ -33,11 +33,12 @@ use app\models\RegistrationType;
  * @property string $token
  *
  * @property Invoice $invoice
- * @property RegistrationTyp $registrationType
+ * @property RegistrationType $registrationType
  */
 class Registration extends \yii\db\ActiveRecord
 {
     public $file_payment_receipt;
+    public $file_student_id;
 
     /**
      * @inheritdoc
@@ -65,7 +66,7 @@ class Registration extends \yii\db\ActiveRecord
             //[['registration_type_id'], 'in', 'range' => RegistrationType::find()->select('id')->asArray()->column()],
             //[['registration_type_id'], 'exist', 'targetClass' => 'app\models\RegistrationType', 'targetAttribute' => 'id' ],
             [['registration_type_id'], 'exist', 'targetClass' => RegistrationType::className(), 'targetAttribute' => 'id' ],
-            [['file_payment_receipt'], 'file', 'skipOnEmpty' => false, 'extensions' => 'pdf,png,jpg,jpeg,bmp,doc,docx'],
+            [['file_payment_receipt','file_student_id'], 'file', 'skipOnEmpty' => false, 'extensions' => 'pdf,png,jpg,jpeg,bmp,doc,docx'],
 
             /*
             [['business_phone', 'fax'],'match',
@@ -83,7 +84,7 @@ class Registration extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'registration_type_id' => Yii::t('app', 'Registration Type ID'),
+            'registration_type_id' => 'Opción de registro',
             'organization_name' => Yii::t('app', 'Organization Name'),
             'first_name' => Yii::t('app', 'First Name'),
             'last_name' => Yii::t('app', 'Last Name'),
@@ -105,6 +106,8 @@ class Registration extends \yii\db\ActiveRecord
             'emergency_name' => Yii::t('app', 'Emergency Name'),
             'emergency_phone' => Yii::t('app', 'Emergency Phone'),
             'token' => Yii::t('app', 'Token'),
+            'file_payment_receipt' => 'Comprobane de pago',
+            'file_student_id' => 'Identificación según opción de registro'
         ];
     }
 
@@ -118,10 +121,11 @@ class Registration extends \yii\db\ActiveRecord
 
     /**
      * @return \yii\db\ActiveQuery
+     * Podemos llamar a su valor mediante $model->registrationType->name por ejemplo
      */
     public function getRegistrationType()
     {
-        return $this->hasOne(RegistrationTyp::className(), ['id' => 'registration_type_id']);
+        return $this->hasOne(RegistrationType::className(), ['id' => 'registration_type_id']);
     }
 
     /**
@@ -130,12 +134,22 @@ class Registration extends \yii\db\ActiveRecord
      */
     public function beforeSave($insert){
         if(parent::beforeSave($insert)){
+
+            // Payment Receipt
             $fileNamePaymentReceipt = uniqid().'.'.$this->file_payment_receipt->extension;
             $this->file_payment_receipt->saveAs('files/payment/'.$fileNamePaymentReceipt);
             $this->payment_receipt = $fileNamePaymentReceipt;
+
+            // Student ID
+            var_dump($this->student_id);
+            var_dump($this->file_student_id);
             if(empty($this->student_id)){
                 $this->student_id = null;
+            } else {
+                $fileNameStudentId = uniqid().'.'.$this->file_student_id->extension;
+                $this->file_student_id->saveAs('files/student_id/'.$fileNameStudentId);
             }
+
             return true;
         };
         return false;

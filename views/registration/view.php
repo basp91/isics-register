@@ -2,11 +2,12 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\RegistrationType;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Registration */
 
-$this->title = $model->id;
+$this->title = $model->display_name;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Registrations'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -29,7 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'registration_type_id',
+            [
+                'attribute'=>'registration_type_id',
+                //'value'=>RegistrationType::find()->where(['id'=>$model->registration_type_id])->one()->name,
+                'value'=>$model->registrationType->name,
+            ],
             'organization_name',
             'first_name',
             'last_name',

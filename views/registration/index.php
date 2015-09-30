@@ -23,31 +23,19 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'registration_type_id',
+            //'registration_type_id',
+            [
+                'attribute'=> 'display_name',
+                'format'=>'raw',
+                'value'=> function($dataProvider){
+                    return Html::a($dataProvider->display_name, ['registration/view', 'id'=>$dataProvider->id]);
+                }
+            ],
             'organization_name',
-            'first_name',
-            'last_name',
-            // 'display_name',
-            // 'degree',
-            // 'business_phone',
-            // 'fax',
-            // 'email:email',
-            // 'email2:email',
-            // 'address1',
-            // 'address2',
-            // 'city',
-            // 'state',
-            // 'province',
-            // 'zip',
-            // 'country',
+            'email:email',
+            'country',
             // 'student_id',
-            // 'payment_receipt',
-            // 'emergency_name',
-            // 'emergency_phone',
-            // 'token',
+            'payment_receipt',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

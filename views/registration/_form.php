@@ -73,11 +73,9 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($model, 'country')->textInput(['maxlength' => true]) ?>
 
-    <?php if($model->registration_type_id ==  ('2' || '4')): ?>
+    <?= $form->field($model, 'student_id')->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'student_id')->textInput(['maxlength' => true]) ?>
-
-    <?php endif; ?>
+    <?= $form->field($model, 'file_student_id')->fileInput() ?>
 
     <?= $form->field($model, 'file_payment_receipt')->fileInput() ?>
 
