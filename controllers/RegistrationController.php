@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\Invoice;
+use app\models\InvoiceSearch;
 use app\models\Registration;
 use app\models\RegistrationSearch;
 use yii\filters\VerbFilter;
@@ -61,20 +63,29 @@ class RegistrationController extends Controller
      */
     public function actionCreate()
     {
-
-        $model = new Registration();
-        if ($model->load(Yii::$app->request->post())) {
-            $model->file_payment_receipt = UploadedFile::getInstance($model,'file_payment_receipt');
-            $model->file_student_id = UploadedFile::getInstance($model,'file_student_id');
-            //var_dump($model);
-            $model->validate();
-            var_dump($model->errors);
-            if($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        $registration_model = new Registration();
+        $invoice_model = new Invoice();
+        if ($registration_model->load(Yii::$app->request->post())) {
+            $registration_model->file_payment_receipt = UploadedFile::getInstance($registration_model,'file_payment_receipt');
+            $registration_model->file_student_id = UploadedFile::getInstance($registration_model,'file_student_id');
+            $isValid = $registration_model->validate();
+            var_dump($registration_model->errors);
+            if ($invoice_model->load(Yii::$app->request->post())) {
+                $isValid = $isValid && $invoice_model->validate();
+                var_dump($invoice_model->errors);
+            }
+            if($isValid){
+                if( $registration_model->save(false)){
+                    $invoice_model->registration_id = $registration_model->id;
+                    if($invoice_model->save(false)){
+                        return $this->redirect(['view', 'id' => $registration_model->id]);
+                    }
+                }
             }
         } else {
             return $this->render('create', [
-                'model' => $model,
+                'registration_model' => $registration_model,
+                'invoice_model' => $invoice_model,
             ]);
         }
     }

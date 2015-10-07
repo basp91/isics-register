@@ -15,6 +15,7 @@ use Yii;
  * @property string $city
  * @property string $state
  * @property string $email
+ * @property integer $registration_id
  *
  * @property Registration $id0
  */
@@ -34,8 +35,8 @@ class Invoice extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'business_name', 'rfc', 'address', 'zip', 'city', 'state', 'email'], 'required'],
-            [['id', 'zip'], 'integer'],
+            [['business_name', 'rfc', 'address', 'zip', 'city', 'state', 'email'], 'required'],
+            [['zip'], 'integer'],
             [['business_name', 'address'], 'string', 'max' => 175],
             [['rfc'], 'string', 'max' => 20],
             [['city', 'state', 'email'], 'string', 'max' => 45]
@@ -56,14 +57,16 @@ class Invoice extends \yii\db\ActiveRecord
             'city' => Yii::t('app', 'City'),
             'state' => Yii::t('app', 'State'),
             'email' => Yii::t('app', 'Email'),
+            'registration_id' => "Registration ID"
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getId0()
+    public function getRegistration()
     {
-        return $this->hasOne(Registration::className(), ['id' => 'id']);
+        return $this->hasOne(Registration::className(), ['id' => 'registration_id']);
     }
+
 }

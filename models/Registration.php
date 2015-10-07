@@ -54,10 +54,10 @@ class Registration extends \yii\db\ActiveRecord
     public function rules()
     {
         return [ //se checan en orden estas reglas
-            [['registration_type_id', 'organization_name', 'first_name', 'last_name', 'display_name', 'business_phone', 'email', 'country', 'emergency_name', 'emergency_phone', 'token'], 'required'],
+            [['registration_type_id', 'organization_name', 'first_name', 'last_name', 'display_name', 'business_phone', 'email', 'country', 'emergency_name', 'emergency_phone'], 'required'],
             [['registration_type_id', 'zip'], 'integer'],
             [['organization_name', 'first_name', 'address1', 'address2', 'emergency_name'], 'string', 'max' => 150],
-            [['last_name', 'display_name', 'email', 'email2', 'token'], 'string', 'max' => 100],
+            [['last_name', 'display_name', 'email', 'email2'], 'string', 'max' => 100],
             [['degree', 'business_phone', 'fax', 'city', 'state', 'province', 'country', 'student_id', 'payment_receipt', 'emergency_phone'], 'string', 'max' => 45],
             [['email','student_id','payment_receipt', 'token'], 'unique'],
             [['email','email2'], 'email'],
@@ -116,7 +116,7 @@ class Registration extends \yii\db\ActiveRecord
      */
     public function getInvoice()
     {
-        return $this->hasOne(Invoice::className(), ['id' => 'id']);
+        return $this->hasOne(Invoice::className(), ['registration_id' => 'id']);
     }
 
     /**
@@ -148,6 +148,12 @@ class Registration extends \yii\db\ActiveRecord
             } else {
                 $fileNameStudentId = uniqid().'.'.$this->file_student_id->extension;
                 $this->file_student_id->saveAs('files/student_id/'.$fileNameStudentId);
+            }
+
+            // TOKEN
+            if(empty($this->token)){
+
+                $this->token=Yii::$app->getSecurity()->generateRandomString();
             }
 
             return true;
