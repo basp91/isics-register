@@ -64,18 +64,53 @@ class Registration extends \yii\db\ActiveRecord
             [['email','student_id','payment_receipt', 'token'], 'unique'],
             [['email','email2'], 'email'],
             [['email2'],'compare','compareAttribute'=>'email'],
-
             //[['registration_type_id'], 'in', 'range' => RegistrationType::find()->select('id')->asArray()->column()],
             //[['registration_type_id'], 'exist', 'targetClass' => 'app\models\RegistrationType', 'targetAttribute' => 'id' ],
             [['registration_type_id'], 'exist', 'targetClass' => RegistrationType::className(), 'targetAttribute' => 'id' ],
-            [['file_payment_receipt','file_student_id'], 'file', 'skipOnEmpty' => false, 'extensions' => 'pdf,png,jpg,jpeg,bmp,doc,docx'],
-            [['same_adress', 'requires_invoice'], 'boolean']
-            /*
+            [['file_payment_receipt'], 'file', 'skipOnEmpty' => false, 'extensions' => 'pdf,png,jpg,jpeg,bmp,doc,docx'],
+            [['file_student_id'], 'file', 'skipOnEmpty' => false, 'extensions' => 'pdf,png,jpg,jpeg,bmp,doc,docx',
+                'when' => function($model){
+                    switch($model->registration_type_id){
+                        case 2:
+                        case 4:
+                        case 5: return true;
+                        default: return false;
+                    }
+                }, 'whenClient' => 'function(attribute, value){
+                        var registration_type_selected = $("[name~=\'Registration[registration_type_id]\']:checked").val()
+                        switch(registration_type_selected)
+                        {
+                            case "2":
+                            case "4":
+                            case "5": return true;
+                            default: return false;
+                        }
+                    }'
+            ],
+            [['student_id'],'required','when' => function($model){
+                switch($model->registration_type_id){
+                    case 2:
+                    case 4:
+                    case 5: return true;
+                    default: return false;
+                }
+            }, 'whenClient' => 'function(attribute, value){
+                        var registration_type_selected = $("[name~=\'Registration[registration_type_id]\']:checked").val()
+                        switch(registration_type_selected)
+                        {
+                            case "2":
+                            case "4":
+                            case "5": return true;
+                            default: return false;
+                        }
+                    }'
+            ],
+            [['same_adress', 'requires_invoice'], 'boolean'],
+
             [['business_phone', 'fax'],'match',
-                'pattern' => '/^(?:1(?:[. -])?)?(?:\((?=\d{3}\)))?([2-9]\d{2})(?:(?<=\(\d{3})\))? ?(?:(?<=\d{3})[.-])?([2-9]\d{2})[. -]?(\d{4})(?: (?i:ext)\.? ?(\d{1,5}))?$/',
+                'pattern' => '/(\+*\d{1,})*([ |\(])*(\d{3})[^\d]*(\d{3})[^\d]*(\d{4})/',
                 'message' => '{attribute} is invalid. Please enter your {attribute} with area code in a valid format (e.g. 999-999-9999)'
             ]
-            */
         ];
     }
 

@@ -64,20 +64,38 @@ class RegistrationController extends Controller
     public function actionCreate()
     {
         $registration_model = new Registration();
+        $registration_model->registration_type_id = 1;
         $invoice_model = new Invoice();
-        if ($registration_model->load(Yii::$app->request->post())) {
+        if ($registration_model->load(Yii::$app->request->post()))
+        {
             $registration_model->file_payment_receipt = UploadedFile::getInstance($registration_model,'file_payment_receipt');
-            $registration_model->file_student_id = UploadedFile::getInstance($registration_model,'file_student_id');
-            $isValid = $registration_model->validate();
-            var_dump($registration_model->errors);
-            if ($invoice_model->load(Yii::$app->request->post())) {
-                $isValid = $isValid && $invoice_model->validate();
-                var_dump($invoice_model->errors);
+            switch ($registration_model-> registration_type_id)
+            {
+                case 2:
+                case 4:
+                case 5: $registration_model->file_student_id = UploadedFile::getInstance($registration_model, 'file_student_id');break;
             }
+            $isValid = $registration_model->validate();
+            if($registration_model->requires_invoice)
+            {
+                if ($invoice_model->load(Yii::$app->request->post()))
+                {
+                    $isValid = $isValid && $invoice_model->validate();
+                    var_dump($invoice_model->errors);
+                }
+            }
+            var_dump($registration_model->errors);
             if($isValid){
                 if( $registration_model->save(false)){
-                    $invoice_model->registration_id = $registration_model->id;
-                    if($invoice_model->save(false)){
+                    if($registration_model->requires_invoice)
+                    {
+                        $invoice_model->registration_id = $registration_model->id;
+                        if($invoice_model->save(false)){
+                            return $this->redirect(['view', 'id' => $registration_model->id]);
+                        }
+                    }
+                    else
+                    {
                         return $this->redirect(['view', 'id' => $registration_model->id]);
                     }
                 }

@@ -35,7 +35,11 @@ class Invoice extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['business_name', 'rfc', 'address', 'zip', 'city', 'state', 'email'], 'required'],
+            [['business_name', 'rfc', 'address', 'zip', 'city', 'state', 'email'], 'required',
+                'whenClient' => 'function(attribute, value){
+                    return $("[name=\'Registration[requires_invoice]\']:checked").val() == "1";
+                }'
+            ],
             [['zip'], 'integer'],
             [['business_name', 'address'], 'string', 'max' => 175],
             [['rfc'], 'string', 'max' => 20],
