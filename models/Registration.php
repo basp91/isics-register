@@ -39,6 +39,8 @@ class Registration extends \yii\db\ActiveRecord
 {
     public $file_payment_receipt;
     public $file_student_id;
+    public $requires_invoice = 0;
+    public $same_adress = 0;
 
     /**
      * @inheritdoc
@@ -54,7 +56,7 @@ class Registration extends \yii\db\ActiveRecord
     public function rules()
     {
         return [ //se checan en orden estas reglas
-            [['registration_type_id', 'organization_name', 'first_name', 'last_name', 'display_name', 'business_phone', 'email', 'country', 'emergency_name', 'emergency_phone'], 'required'],
+            [['registration_type_id', 'organization_name', 'first_name', 'last_name', 'display_name', 'business_phone', 'email', 'country', 'emergency_name', 'emergency_phone','requires_invoice', 'same_adress'], 'required'],
             [['registration_type_id', 'zip'], 'integer'],
             [['organization_name', 'first_name', 'address1', 'address2', 'emergency_name'], 'string', 'max' => 150],
             [['last_name', 'display_name', 'email', 'email2'], 'string', 'max' => 100],
@@ -67,7 +69,7 @@ class Registration extends \yii\db\ActiveRecord
             //[['registration_type_id'], 'exist', 'targetClass' => 'app\models\RegistrationType', 'targetAttribute' => 'id' ],
             [['registration_type_id'], 'exist', 'targetClass' => RegistrationType::className(), 'targetAttribute' => 'id' ],
             [['file_payment_receipt','file_student_id'], 'file', 'skipOnEmpty' => false, 'extensions' => 'pdf,png,jpg,jpeg,bmp,doc,docx'],
-
+            [['same_adress', 'requires_invoice'], 'boolean']
             /*
             [['business_phone', 'fax'],'match',
                 'pattern' => '/^(?:1(?:[. -])?)?(?:\((?=\d{3}\)))?([2-9]\d{2})(?:(?<=\(\d{3})\))? ?(?:(?<=\d{3})[.-])?([2-9]\d{2})[. -]?(\d{4})(?: (?i:ext)\.? ?(\d{1,5}))?$/',
@@ -106,8 +108,10 @@ class Registration extends \yii\db\ActiveRecord
             'emergency_name' => Yii::t('app', 'Emergency Name'),
             'emergency_phone' => Yii::t('app', 'Emergency Phone'),
             'token' => Yii::t('app', 'Token'),
-            'file_payment_receipt' => 'Comprobane de pago',
-            'file_student_id' => 'Identificación según opción de registro'
+            'file_payment_receipt' => 'Payment Receipt',
+            'file_student_id' => 'Identificación según opción de registro',
+            'requires_invoice' => 'Do you require an invoice?',
+            'same_adress' => 'Same Adress as above',
         ];
     }
 
