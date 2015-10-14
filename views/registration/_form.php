@@ -11,6 +11,35 @@ use yii\helpers\ArrayHelper;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+<?php $this->registerJs('
+
+    var registration_type = $("[name~=\'Registration[registration_type_id]\']")
+
+    registration_type.change(
+        function(){
+           var registration_type_selected = $("[name~=\'Registration[registration_type_id]\']:checked").val()
+           var student_id = $("[name~=\'Registration[student_id]\']")
+           var file_student_id = $("[name~=\'Registration[file_student_id]\']")
+           switch(registration_type_selected){
+                case "2":
+                case "4":
+                case "5":
+                    student_id.prop("disabled", false);
+                    $(".field-registration-student_id").show()
+                    file_student_id.prop("disabled", true);
+                    $(".field-registration-file_student_id").show()
+                    break;
+                default:
+                    student_id.prop("disabled", true);
+                    $(".field-registration-student_id").hide()
+                    file_student_id.prop("disabled", true);
+                    $(".field-registration-file_student_id").hide()
+                    break;
+           }
+        }
+    )
+') ?>
+
 <div class="registration-form">
 
     <?php $form = ActiveForm::begin([
@@ -23,6 +52,10 @@ use yii\helpers\ArrayHelper;
     <?= $form->field($registration_model, 'registration_type_id')->radioList(
         ArrayHelper::map(RegistrationType::find()->all(),'id','name')
     )?>
+
+    <?= $form->field($registration_model, 'student_id')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($registration_model, 'file_student_id')->fileInput() ?>
 
     <?= $form->field($registration_model, 'organization_name')->textInput(['maxlength' => true]) ?>
 
@@ -74,9 +107,7 @@ use yii\helpers\ArrayHelper;
 
     <?= $form->field($registration_model, 'country')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($registration_model, 'student_id')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($registration_model, 'file_student_id')->fileInput() ?>
 
     <?= $form->field($registration_model, 'file_payment_receipt')->fileInput() ?>
 
